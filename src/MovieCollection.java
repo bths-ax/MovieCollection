@@ -115,7 +115,7 @@ public class MovieCollection
 		// their names and add them to a results list
 		ArrayList<String> results = new ArrayList<String>();
 		for (String castMember : allCastMembers)
-			if (castMember.indexOf(query) != -1)
+			if (castMember.toLowerCase().indexOf(query) != -1)
 				results.add(castMember);
 		sortStrings(results);
 

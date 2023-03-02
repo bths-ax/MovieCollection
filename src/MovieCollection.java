@@ -96,13 +96,9 @@ public class MovieCollection
 		// Build list of all cast members appearing in any movie
 		ArrayList<String> allCastMembers = new ArrayList<String>();
 		for (Movie movie : movies) {
-			String[] castMembers = movie.getCast().split("|");
+			String[] castMembers = movie.getCast().split("\\|");
 			for (String castMember : castMembers) {
-				boolean isDuplicate = false;
-				for (String existingCastMember : allCastMembers)
-					if (existingCastMember.equals(castMember))
-						isDuplicate = true;
-				if (!isDuplicate) {
+				if (!allCastMembers.contains(castMember)) {
 					allCastMembers.add(castMember);
 				}
 			}
@@ -126,7 +122,7 @@ public class MovieCollection
 		System.out.print("Enter a number: ");
 
 		int index = scanner.nextInt() - 1;
-		String castQuery = results.get(index - 1);
+		String castQuery = results.get(index);
 
 		// Search for all movies with `castQuery` as a cast
 		// member and add them to a new results list
@@ -140,20 +136,85 @@ public class MovieCollection
 		displaySearchResults(mResults);
 	}
 
+	private void listGenres() {
+		// Build list of all genres appearing in any movie
+		ArrayList<String> allGenres = new ArrayList<String>();
+		for (Movie movie : movies) {
+			String[] genres = movie.getGenres().split("\\|");
+			for (String genre : genres) {
+				if (!allGenres.contains(genre)) {
+					allGenres.add(genre);
+				}
+			}
+		}
 
-	private void listGenres()
-	{
+		sortStrings(allGenres);
 
+		// Print genres and ask for a genre to see movies of
+		for (int i = 0; i < allGenres.size(); i++)
+			System.out.println((i + 1) + ". " + allGenres.get(i));
+		System.out.println("Which genre do you want to see the movies of?");
+		System.out.print("Enter a number: ");
+
+		int index = scanner.nextInt() - 1;
+		String genreQuery = allGenres.get(index);
+
+		// Search for all movies with `genreQuery` as a
+		// genre and add them to a new results list
+		ArrayList<Movie> results = new ArrayList<Movie>();
+		for (Movie movie : movies)
+			if (movie.getGenres().indexOf(genreQuery) != -1)
+				results.add(movie);
+		sortMovies(results);
+
+		// Print results
+		displaySearchResults(results);
 	}
 
-	private void listHighestRated()
-	{
+	private void listHighestRated() {
+		// Build list of the 50 highest rated movies,
+		// sorting the list while adding new elements
+		ArrayList<Movie> results = new ArrayList<Movie>();
+		for (Movie movie : movies) {
+			int sortedIdx = results.size();
+			while (sortedIdx > 0 && results.get(sortedIdx - 1).getUserRating() < movie.getUserRating())
+				sortedIdx--;
+			results.add(sortedIdx, movie);
+			if (results.size() > 50) {
+				results.remove(50 - 1);
+			}
+		}
 
+		// Print results - why the highest rated movie only got a 8.4 lol
+		for (int i = 0; i < results.size(); i++)
+			System.out.println(String.format("%d. %s: %.1f", i + 1, 
+				results.get(i).getTitle(),
+				results.get(i).getUserRating()));
+
+		displayMoreDetails(results);
 	}
 
-	private void listHighestRevenue()
-	{
+	private void listHighestRevenue() {
+		// Build list of the 50 highest revenue movies,
+		// sorting the list while adding new elements
+		ArrayList<Movie> results = new ArrayList<Movie>();
+		for (Movie movie : movies) {
+			int sortedIdx = results.size();
+			while (sortedIdx > 0 && results.get(sortedIdx - 1).getRevenue() < movie.getRevenue())
+				sortedIdx--;
+			results.add(sortedIdx, movie);
+			if (results.size() > 50) {
+				results.remove(50 - 1);
+			}
+		}
 
+		// Print results
+		for (int i = 0; i < results.size(); i++)
+			System.out.println(String.format("%d. %s: %d", i + 1, 
+				results.get(i).getTitle(),
+				results.get(i).getRevenue()));
+
+		displayMoreDetails(results);
 	}
 
 	private void sortMovies(ArrayList<Movie> toSort) {
@@ -202,6 +263,11 @@ public class MovieCollection
 
 		for (int i = 0; i < results.size(); i++)
 			System.out.println((i + 1) + ". " + results.get(i).getTitle());
+
+		displayMoreDetails(results);
+	}
+
+	private void displayMoreDetails(ArrayList<Movie> results) {
 		System.out.println("Which movie would you like to learn more about?");
 		System.out.print("Enter number: ");
 
